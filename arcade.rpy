@@ -188,7 +188,7 @@ screen arcade_store:
             background 'mods/arcade/Battle UI/arcadestorebar_window.png'
             at move_down(-590,0)
             vbox:
-                spacing 12
+                spacing 8
                 for item in arcade.storeItems:
                     button:
                         xpos 20

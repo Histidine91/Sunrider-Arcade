@@ -353,11 +353,19 @@ init 9 python:
         limit = 2
         action = ("buyUnit", "RyuvianFalcon")
     
+    class PactEliteArcadeStore(ArcadeStoreItem):
+        id = "pactElite"
+        name = "PACT Elite"
+        tooltip = "Buys a PACT Elite."
+        cost = 3000
+        limit = 2
+        action = ("buyUnit", "FriendlyPactElite")
+    
     class FreighterArcadeStore(ArcadeStoreItem):
         id = "freighter"
         name = "Munitions Freighter"
         tooltip = "Buys a freighter that can reload missiles of friendly units."
-        cost = 3000
+        cost = 4000
         limit = 2
         action = ("buyUnit", "MunitionsFreighter")
     
@@ -384,8 +392,9 @@ init 9 python:
         action = ("enableAwakening",)
                 
     arcadeStoreItems = [CeraGunboatArcadeStore(), UnionFrigateArcadeStore(), UnionBattleshipArcadeStore(), 
-                AllianceCruiserArcadeStore(), AllianceBattleshipArcadeStore(), RyuvianFalconArcadeStore(),
-                FreighterArcadeStore(),RepairDroneArcadeStore(), TorpedoArcadeStore(), AwakeningArcadeStore()]
+                AllianceCruiserArcadeStore(), AllianceBattleshipArcadeStore(), PactEliteArcadeStore(), 
+                RyuvianFalconArcadeStore(),FreighterArcadeStore(),RepairDroneArcadeStore(), TorpedoArcadeStore(), 
+                AwakeningArcadeStore()]
                 
 label arcade_inits:
     python:
