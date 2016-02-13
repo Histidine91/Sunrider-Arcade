@@ -95,6 +95,8 @@ init 10 python:
         if item.cost > getArcadeMoneyEarned():
             show_message("Not enough money")
             return
+        if item.limit == 0:
+            return
         act = item.action
         if act[0] == "buyUnit":
             print("Trying to make " + act[1]+ " at " + str(store.sunrider.location[0]) + ", " + str(store.sunrider.location[1]))
@@ -104,7 +106,7 @@ init 10 python:
                     renpy.music.play(ship.selection_voice,channel = ship.voice_channel)
                 else:
                     random_voice = renpy.random.choice(ship.selection_voice)
-                    renpy.music.play('sound/Voice/{}'.format(random_voice),channel = ship.voice_channel)
+                    renpy.music.play(random_voice,channel = ship.voice_channel)
             arcade.spawnedAllyShips.append(ship)
         
         elif act[0] == "buyRepairDrone":
@@ -120,18 +122,14 @@ init 10 python:
             store.sunrider.rockets += 1
         elif act[0] == "enableAwakening":       # TODO: safety for if you already have Awaken?
             blackjack.register_weapon(AwakenAsaga())
-            if not type(blackjack.buffed_voice) is list:
-                renpy.music.play(blackjack.buffed_voice,channel = blackjack.voice_channel)
-            else:
-                random_voice = renpy.random.choice(blackjack.buffed_voice)
-                renpy.music.play('sound/Voice/{}'.format(random_voice),channel = blackjack.voice_channel)
+            blackjack.voice('HitBuff')
             
         else:   # do nothing
             return
         if item.limit > 0:
             item.limit -= 1
-            if (item.limit <= 0):        # TODO: find a way to allow this while also enabling new store items in existing savegame
-                arcade.storeItems.remove(item)
+            #if (item.limit <= 0):        # TODO: find a way to allow this while also enabling new store items in existing savegame
+            #    arcade.storeItems.remove(item)
                 
         arcade.moneySpent += item.cost
         #ui.interact()
@@ -196,15 +194,33 @@ screen arcade_store:
                         xpos 20
                         idle_background 'Battle UI/commandbar_button.png'
                         hover_background hoverglow('Battle UI/commandbar_button.png')
-                        action [Function(arcadeStorePurchase, item),Hide('arcade_store'),SetField(arcade,'showingStore',False)]
+                        insensitive_background 'mods/arcade/Battle UI/commandbar_button_grey.png'
+                        action If(item.limit != 0, [Function(arcadeStorePurchase, item),Hide('arcade_store'),SetField(arcade,'showingStore',False)], None)
 
                         has hbox
-
-                        text item.name.upper():
-                            ypos 5
-                            min_width 300
-                            size 22
-                            outlines [(1,'222',0,0)]
+                        
+                        if item.limit == -1:
+                            text item.name.upper():
+                                ypos 5
+                                min_width 300
+                                size 22
+                                outlines [(1,'222',0,0)]
+                        else:
+                            text item.name.upper():
+                                ypos 5
+                                min_width 260   # 40 less than with no item
+                                size 22
+                                outlines [(1,'222',0,0)]
+                                
+                            text "(" + str(item.limit) + ")":
+                                ypos 5
+                                min_width 40
+                                size 22
+                                if item.limit > 0:
+                                    color 'dd9'
+                                else:
+                                    color 'f77'
+                                outlines [(1,'222',0,0)]
 
                         text str(item.cost):
                             ypos 5

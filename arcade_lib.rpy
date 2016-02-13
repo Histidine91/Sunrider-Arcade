@@ -285,7 +285,7 @@ init 9 python:
                     if BM.phase == 'Player':
                         if not target == parent and target.faction == 'Player':
                             if target.buffed_voice is not None:
-                                renpy.music.play( 'sound/Voice/{}'.format( renpy.random.choice(target.buffed_voice) ),channel = target.voice_channel )
+                                renpy.music.play( renpy.random.choice(target.buffed_voice) ), channel = target.voice_channel )
                     message = "{0} reloading missiles for {1}".format(parent.name, target.name) # we can't make this only display when in enemy phase; it hides the buff anim
                     show_message(message)
                     target.getting_buff = False
@@ -296,6 +296,7 @@ init 9 python:
                     renpy.show_screen('battle_screen')
                 return 0
     
+    # Arcade store item definitions
     class ArcadeStoreItem(store.object):
         id = "id"
         name = "Generic Item"
@@ -309,6 +310,7 @@ init 9 python:
         name = "Cera Gunboat"
         tooltip = "Buys a Cera Gunboat."
         cost = 1500
+        limit = 4
         action = ("buyUnit", "CeraGunboat")
         
     class UnionFrigateArcadeStore(ArcadeStoreItem):
@@ -316,6 +318,7 @@ init 9 python:
         name = "Union Frigate"
         tooltip = "Buys a Union Frigate."
         cost = 1500
+        limit = 3
         action = ("buyUnit", "UnionFrigate")
                 
     class UnionBattleshipArcadeStore(ArcadeStoreItem):
@@ -323,6 +326,7 @@ init 9 python:
         name = "Union Battleship"
         tooltip = "Buys a Union Battleship."
         cost = 7000
+        limit = 1
         action = ("buyUnit", "UnionBattleship")
     
     class AllianceCruiserArcadeStore(ArcadeStoreItem):
@@ -330,6 +334,7 @@ init 9 python:
         name = "Alliance Cruiser"
         tooltip = "Buys an Alliance Cruiser."
         cost = 4000
+        limit = 2
         action = ("buyUnit", "AllianceCruiser")
                 
     class AllianceBattleshipArcadeStore(ArcadeStoreItem):
@@ -337,6 +342,7 @@ init 9 python:
         name = "Alliance Battleship"
         tooltip = "Buys an Alliance Battleship."
         cost = 8000
+        limit = 1
         action = ("buyUnit", "AllianceBattleship")
                 
     class RyuvianFalconArcadeStore(ArcadeStoreItem):
@@ -344,6 +350,7 @@ init 9 python:
         name = "Ryuvian Falcon"
         tooltip = "Buys a Ryuvian Falcon."
         cost = 3000
+        limit = 2
         action = ("buyUnit", "RyuvianFalcon")
     
     class FreighterArcadeStore(ArcadeStoreItem):
@@ -351,6 +358,7 @@ init 9 python:
         name = "Munitions Freighter"
         tooltip = "Buys a freighter that can reload missiles of friendly units."
         cost = 3000
+        limit = 2
         action = ("buyUnit", "MunitionsFreighter")
     
     class RepairDroneArcadeStore(ArcadeStoreItem):
@@ -541,7 +549,7 @@ label arcade_inits:
     return
 
 # main menu screen override
-init 9 python:
+init 9:
     screen main_menu:
 
         zorder 1000
