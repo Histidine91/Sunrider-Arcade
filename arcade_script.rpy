@@ -55,6 +55,7 @@ label arcade_tutorial:
     ava "However, if we take too long, the next wave will spawn anyway and dogpile us. Don't let this happen."
     ava "Each enemy ship has a slightly randomized spawn location, so we cannot predict exactly where they'll appear."
     ava "Killing enemies will also earn us money to buy mercenary ships with. These will spawn as close to the Sunrider as they can, and are instantly ready for action."
+    ava "The game is won when the final boss is killed."
     ava "Got all that?"
     kay "Yeah, thanks."
     

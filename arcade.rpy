@@ -73,7 +73,7 @@ init 10 python:
             for shipEntry in wave["ships"]:
                 posX = randint(shipEntry[1], shipEntry[3])
                 posY = randint(shipEntry[2], shipEntry[4])
-                create_ship(shipEntry[0], (posX, posY))
+                create_ship(getattr(store, shipEntry[0])(), (posX, posY))
             if 'playerMusic' in wave:
                 store.PlayerTurnMusic = wave["playerMusic"]
                 musicChanged = True
@@ -123,6 +123,8 @@ init 10 python:
         elif act[0] == "enableAwakening":       # TODO: safety for if you already have Awaken?
             blackjack.register_weapon(AwakenAsaga())
             blackjack.voice('HitBuff')
+        elif act[0] == "addCMDPoints":
+            BM.max_cmd = BM.max_cmd + act[1]
             
         else:   # do nothing
             return
@@ -188,7 +190,7 @@ screen arcade_store:
             background 'mods/arcade/Battle UI/arcadestorebar_window.png'
             at move_down(-590,0)
             vbox:
-                spacing 8
+                spacing 6
                 for item in arcade.storeItems:
                     button:
                         xpos 20
