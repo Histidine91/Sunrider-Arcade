@@ -146,6 +146,7 @@ label after_arcade:
     hide screen commands
     
     $ VNmode()   
+    $ end_arcade_score = BM.intel
     
     show screen leftbuttons
     
@@ -159,10 +160,10 @@ label after_arcade:
     python:
         if persistent.arcade_high_score is None:
             persistent.arcade_high_score = 0
-        difficulty_mod = store.difficulty + 1
-        if (store.difficulty == 5):      # TODO thwart "raise difficulty just before win" hax
-            difficulty_mod = store.difficulty + 3       # compensate for space whale tax
-        score = BM.intel * (difficulty_mod)/(BM.turn_count + 5)
+        difficulty_mod = BM.lowest_difficulty + 1
+        if (BM.lowest_difficulty == 5):
+            difficulty_mod = BM.lowest_difficulty + 3       # compensate for space whale tax
+        score = end_arcade_score * (difficulty_mod)/(BM.turn_count + 5)
     
     "Score: {b}[score]{/b}\n(ending intel * (difficulty mod) / (turns taken + 5))"
     
