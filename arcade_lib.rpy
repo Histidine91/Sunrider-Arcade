@@ -1,4 +1,4 @@
-init 9 python:
+init 5 python: # needs to be lower than 6 to ensure Tweakpack's custom_fire settings gets the weapon defs here
     global BM
     if not hasattr(store,'intelN'):
         store.intelN = 0

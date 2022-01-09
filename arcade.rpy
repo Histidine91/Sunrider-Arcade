@@ -245,7 +245,7 @@ screen arcade_store_bar:
                 idle 'Mod/arcade/Battle UI/arcadestorebar.png'
                 hover hoverglow('Mod/arcade/Battle UI/arcadestorebar.png')
                 action [SetField(arcade,'showingStore',True),Show('arcade_store')]
-            text '{!s}'.format(getArcadeMoneyEarned()):
+            text '{:.0f}'.format(getArcadeMoneyEarned()):
                 xanchor 1.0
                 xpos 165
                 ypos 10
@@ -327,7 +327,7 @@ screen arcade_store:
                 idle 'Mod/arcade/Battle UI/arcadestorebar.png'
                 hover hoverglow('Mod/arcade/Battle UI/arcadestorebar.png')
                 action [Hide('arcade_store'),SetField(arcade,'showingStore',False)]
-        text '{!s}'.format(getArcadeMoneyEarned()):
+        text '{:.0f}'.format(getArcadeMoneyEarned()):
             xanchor 1.0
             xpos 165
             ypos 10
