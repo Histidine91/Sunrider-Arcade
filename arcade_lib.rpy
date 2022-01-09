@@ -329,11 +329,11 @@ init 5 python: # needs to be lower than 6 to ensure Tweakpack's custom_fire sett
             self.boss = False
             self.default_weapon_list = [PACTCruiserLaser(),PACTCruiserKinetic(),PactRepair(),AccUp()]
     
-    # copied from BossLaser
-    class LegionSuperLaser(Laser):
+    # piercing laser like Nightmare Ascendant has
+    class LegionSuperLaser(BossLaser):
         #pierces through enemies and ignores 30 points of shielding.
         def __init__(self):
-            Laser.__init__(self)
+            BossLaser.__init__(self)
             self.name = 'Legion Superlaser'
             self.ignore_shielding = 30 #subtractive
             self.damage = 320
@@ -341,96 +341,7 @@ init 5 python: # needs to be lower than 6 to ensure Tweakpack's custom_fire sett
             self.shot_count = 1
             self.accuracy = 100
             self.wtype = 'Laser'
-            
-        def fire(self, parent, target, counter = False): 
-            if self.parent is None: self.parent = parent
-            if parent.en < self.energy_cost(parent):  #energy handling
-                return 'no energy'
-            else:
-                parent.en = increment_attribute(parent,'en',-self.energy_cost(parent))
-            
-            BM.battle_log_insert(['attack', 'laser'], "{0} attacks {1} with a super laser".format(parent.name, target))
-                ## actual damage calculation
-            total_damage = 0
-            store.total_armor_negation = 0
-            store.total_shield_negation = 0
-            store.total_flak_interception = 0
-            store.hit_count = 0
-            
-            #get all the hexes in between boss and target location
-            if type(target) is tuple: #I do want to be able to target empty hexes
-                targetobject = store.object()
-                targetobject.location = target
-                listlocs = interpolate_hex(parent.location, target)
-            else:
-                targetobject = target
-                listlocs = interpolate_hex(parent.location, target.location)
-                
-            if self.parent.location in listlocs: listlocs.remove(self.parent.location)
-            
-            #show shots on map
-            BM.shooting = BulletSprite(parent,targetobject,self)
-            order_state = BM.order_used 
-            # BM.order_used = False #hide order button during animation
-            play_sound_effects(self.fire_sound,1)
-            
-            renpy.hide_screen('battle_screen')
-            renpy.show_screen('battle_screen')
-            renpy.hide_screen('commands')            
-            
-            renpy.pause(0.75)
-            BM.shooting = False
-
-            renpy.show_screen('commands')
-            renpy.hide_screen('battle_screen')
-            renpy.show_screen('battle_screen')
-            #stop showing shots moving across map
-
-            #find list of ship being hit
-            ships_hit = []
-            for hex in listlocs:
-                for ship in BM.ships:
-                    if ship.location == hex:
-                        ships_hit.append(ship)
-                    
-            damage_dict = {}
-            for ship in ships_hit:
-                total_damage = 0
-                ship.update_armor()
-                
-                #cover mechanic. it returns true if cover is hit. see functions.rpy
-                if cover_mechanic(self,ship,75):
-                    return 'miss'
-
-                for shot in range(self.shot_count):
-                    damage = self.damage * parent.energy_dmg * renpy.random.triangular(0.95,1.05)  #add a little variation in the damage
-                    damage = damage * (100 + parent.modifiers['damage'][0] + BM.environment['damage']) / 100.0
-                    if ship.shields > 0:
-                        if not self.ignore_shielding:
-                            negation = damage * ship.shields / 100.0
-                        else:
-                            effective_shielding = ship.shields - self.ignore_shielding
-                            if effective_shielding < 0: effective_shielding = 0
-                            negation = damage * effective_shielding / 100.0
-                        damage -= negation
-                        if damage < 0: damage = 1
-                        store.total_shield_negation += int(negation)
-                        BM.battle_log_insert(['attack', 'laser', 'detailed'], "<{0}>{1}'s shields negated {2} damage of {3}'s laser attack".format(str(shot), ship.name, str(int(negation)), parent.name))
-
-                    if damage <= ship.armor:
-                        damage = 1
-                        store.total_armor_negation += damage
-                        BM.battle_log_insert(['attack', 'laser', 'detailed'], "<{0}>{1}'s armour withstood {2}'s laser attack".format(str(shot), ship.name, parent.name))
-                    else:
-                        damage -= ship.armor
-                        store.total_armor_negation += ship.armor
-                        BM.battle_log_insert(['attack', 'laser', 'detailed'], "<{0}>{1}'s armour negated {2} damage of {3}'s laser attack".format(str(shot), ship.name, ship.armor, parent.name))
-                    total_damage += int(damage)
-                    store.hit_count += 1
-                    damage_dict[ship] = int(total_damage)
-                        
-            return damage_dict
-                
+        
     class FreighterReloadMissile(Support):
         def __init__(self):
             Support.__init__(self)
