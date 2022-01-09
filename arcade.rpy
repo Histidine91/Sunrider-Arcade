@@ -14,6 +14,13 @@
         #create_ship(PirateBomber(),(11,5))
 
 init 10 python:
+
+  mod_button_entries.append((
+        "Mod/arcade/UI/arcade_bt.png",
+        (Hide("main_menu_mod"), Start("arcade_from_main_menu")),
+    ))
+
+init 10 python:
     from random import randint
     
     arcade = None
@@ -64,8 +71,9 @@ init 10 python:
         print("Trying wave " + str(arcade.currentWave))
         if arcade.currentWave >= len(arcade.waves):
             BM.you_win()
+            arcade.has_won = True
         else:
-            #BM.battle_bg = "Background/space{!s}.jpg".format(renpy.random.randint(1,9))
+            BM.battle_bg = "Background/space{!s}.jpg".format(renpy.random.randint(1,9))
             arcade.newWaveThisTurn = True
             musicChanged = False
             arcade.turnsSinceLastWave = 0
@@ -120,11 +128,30 @@ init 10 python:
                 show_message("Already have maximum number of torpedoes!")
                 return
             store.sunrider.rockets += 1
-        elif act[0] == "enableAwakening":       # TODO: safety for if you already have Awaken?
+        elif act[0] == "enableAwakening":       # TODO: safety for if you already have Awaken?             
             blackjack.register_weapon(AwakenAsaga())
             blackjack.voice('HitBuff')
         elif act[0] == "addCMDPoints":
             BM.max_cmd = BM.max_cmd + act[1]
+        elif act[0] == "visitResearch": ##N
+            store.intelspent = store.intelN-BM.intel
+            store.intelN = 0
+            for ship in destroyed_ships:
+                if ship.faction != 'Player':
+                    store.intelN += ship.money_reward*0.5 ##N
+            BM.intel = int(store.intelN-store.intelspent)
+            arcade.moneySpent += item.cost
+            renpy.play('sound/beep1.ogg')
+            renpy.call('upgrades_label') ##N
+        elif act[0] == "endarcade":
+            arcade.early_leave = True
+            renpy.music.stop(channel='music', fadeout=2.0)
+            BM.stopAI = True
+            clean_battle_exit()
+            VNmode()
+            renpy.hide_screen('commands')
+            renpy.hide_screen('battle_screen')
+            renpy.jump('after_arcade')
             
         else:   # do nothing
             return
@@ -136,16 +163,64 @@ init 10 python:
         arcade.moneySpent += item.cost
         #ui.interact()
         update_stats()
-            
+
+    def showcurrentIntel(): ##N
+        renpy.hide_screen('message')
+        store.intelspent = store.intelN-BM.intel
+        store.intelN = 0
+        for ship in destroyed_ships:
+            if ship.faction != 'Player':
+                store.intelN += ship.money_reward*0.5 ##N
+        BM.intel = int(store.intelN-store.intelspent)
+        renpy.show_screen('message',message = str(BM.intel) +" intel available",xpos=0.08,ypos=0.06)
+
+    def showintelbutton(): ##N
+        if BM.mission == 'arcade': 
+            renpy.show_screen('intel_screen')
+            BM.attacker = sunrider
+
+    def max_stats(): ##N
+        if BM.battlemode == True:
+            for ship in player_ships:
+                if ship.hp > ship.max_hp:
+                    ship.hp = ship.max_hp
+                if ship.en > ship.max_en:
+                    ship.en = ship.max_en
+                if ship.missiles > ship.max_missiles:
+                    ship.missiles = ship.max_missiles
+        else:
+            for ship in player_ships:
+                ship.hp = ship.max_hp
+                ship.en = ship.max_en
+                ship.missiles = ship.max_missiles
+        return
+
+    start_funcs.append(["True",showintelbutton]) ##N
+
+screen intel_screen(): ##N
+    default tt = Tooltip("")
+    if BM.phase == 'Player' and arcadefrommenu and BM.battlemode:
+            $changedirbutton_idle = im.Rotozoom('Mod/arcade/Battle UI/intel_button.png',0,0.75)
+            imagebutton:
+                xpos 210
+                ypos 10
+                idle changedirbutton_idle
+                hover hoverglow(changedirbutton_idle)
+                action Function(showcurrentIntel)                                   
 
 label arcade_process_wave:
+    if BM.battlemode == False and arcadefrommenu == True:
+        $ renpy.jump("after_arcade")
+
     if arcade is None:
         $ loadArcadeManager()
+        return
     
     if arcade.currentTurn == BM.turn_count:
         return
-    
+    $avc.cost = int(arcade.currentWave*1000+BM.turn_count*100)
     python:
+        #BM.battle_bg = "Background/space{!s}.jpg".format(renpy.random.randint(1,9))    # use this to randomize the BG on every wave
         arcade.currentTurn = BM.turn_count
         arcade.turnsSinceLastWave += 1
         print("Wave processing for turn " + str(BM.turn_count))
@@ -167,8 +242,8 @@ screen arcade_store_bar:
             imagebutton:
                 xpos 0
                 ypos 0
-                idle 'mods/arcade/Battle UI/arcadestorebar.png'
-                hover hoverglow('mods/arcade/Battle UI/arcadestorebar.png')
+                idle 'Mod/arcade/Battle UI/arcadestorebar.png'
+                hover hoverglow('Mod/arcade/Battle UI/arcadestorebar.png')
                 action [SetField(arcade,'showingStore',True),Show('arcade_store')]
             text '{!s}'.format(getArcadeMoneyEarned()):
                 xanchor 1.0
@@ -187,8 +262,8 @@ screen arcade_store:
     fixed:
         xpos 540
         frame:
-            background 'mods/arcade/Battle UI/arcadestorebar_window.png'
-            at move_down(-590,0)
+            background 'Mod/arcade/Battle UI/arcadestorebar_window.png'
+            at move_down(-690,0)
             vbox:
                 spacing 6
                 for item in arcade.storeItems:
@@ -196,7 +271,7 @@ screen arcade_store:
                         xpos 20
                         idle_background 'Battle UI/commandbar_button.png'
                         hover_background hoverglow('Battle UI/commandbar_button.png')
-                        insensitive_background 'mods/arcade/Battle UI/commandbar_button_grey.png'
+                        insensitive_background 'Mod/arcade/Battle UI/commandbar_button_grey.png'
                         action If(item.limit != 0, [Function(arcadeStorePurchase, item),Hide('arcade_store'),SetField(arcade,'showingStore',False)], None)
 
                         has hbox
@@ -248,15 +323,15 @@ screen arcade_store:
                                         outlines [(1,'000',0,0)]
 
         imagebutton:
-                at move_down(0,590)
-                idle 'mods/arcade/Battle UI/arcadestorebar.png'
-                hover hoverglow('mods/arcade/Battle UI/arcadestorebar.png')
+                at move_down(0,690)
+                idle 'Mod/arcade/Battle UI/arcadestorebar.png'
+                hover hoverglow('Mod/arcade/Battle UI/arcadestorebar.png')
                 action [Hide('arcade_store'),SetField(arcade,'showingStore',False)]
         text '{!s}'.format(getArcadeMoneyEarned()):
             xanchor 1.0
             xpos 165
             ypos 10
-            at move_down(10,600,165)
+            at move_down(10,700,165)
             size 30
             color 'fff'
             outlines [(1,'000',0,0)]

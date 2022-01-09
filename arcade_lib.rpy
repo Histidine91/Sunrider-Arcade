@@ -1,4 +1,14 @@
 init 9 python:
+    global BM
+    if not hasattr(store,'intelN'):
+        store.intelN = 0
+    if not hasattr(store,'intelspent'):
+        store.intelspent = 0
+    if not hasattr(store,'arcadeRDcost'):
+        store.arcadeRDcost = 2000
+
+    #talk_buttons.append(["MainMissionCompleted() > 14",'avajagY','captainsloft','arcade_from_game'])
+
     arcadeWaveDefs = [
             {
                 'name' : 'Back to Basics',  #1
@@ -113,8 +123,8 @@ init 9 python:
             {
                 'name' : 'Cry Havoc',  #7
                 'maxDelay' : 5,
-                'playerMusic' : 'mods/arcade/music/Powerful.ogg',
-                'enemyMusic' : 'mods/arcade/music/Sui_Generis.ogg',
+                'playerMusic' : 'Mod/arcade/music/Powerful.ogg',
+                'enemyMusic' : 'Mod/arcade/music/Sui_Generis.ogg',
                 'ships' : {
                         ("PirateIronhog", 14, 6, 15, 7),
                         ("Havoc", 14, 9, 15, 9),
@@ -155,8 +165,8 @@ init 9 python:
             {
                 'name' : 'Consolidation',  #9
                 'maxDelay' : 6,
-                'playerMusic' : 'mods/arcade/music/Overpowered.ogg',
-                'enemyMusic' : 'Music/Gore_and_Sand.ogg',
+                'playerMusic' : 'Mod/arcade/music/Overpowered.ogg',
+                'enemyMusic' : 'Mod/arcade/music/Gore_and_Sand.ogg',
                 'ships' : {
                         ("PactDestroyer", 14, 6, 15, 7),
                         ("PactAssaultCarrier", 14, 9, 15, 9),
@@ -181,7 +191,7 @@ init 9 python:
                 'name' : 'For We Are Many',  #10
                 'maxDelay' : 7,
                 'playerMusic' : 'Music/The_Bladed_Druid.ogg',
-                'enemyMusic' : 'mods/arcade/music/Posthumus_Regium.ogg',
+                'enemyMusic' : 'Mod/arcade/music/Posthumus_Regium.ogg',
                 'ships' : {
                         ("PactCarrier", 16, 7, 17, 7),
                         ("LegionArcade", 16, 9, 16, 9),
@@ -209,30 +219,30 @@ init 9 python:
             {
                 'name' : 'Destiny Ascension',  #11
                 'maxDelay' : 9,
-                'playerMusic' : 'Music/Sora_no_Kodoh.ogg',
-                'enemyMusic' : 'Music/Sora_no_Kodoh.ogg',
+                'playerMusic' : 'Music/The_Bladed_Druid.ogg', ##N 
+                'enemyMusic' : 'Music/Posthumus_Regium.ogg', ##N
                 'ships' : {
-                        #("PactCarrier", 16, 7, 17, 7),
+                        ("PactCarrier", 16, 7, 17, 7),
                         ("Nightmare_Ascendant_Arcade", 16, 9, 16, 9),
-                        #("PactCarrier", 16, 12, 17, 12),
+                        ("PactCarrier", 16, 12, 17, 12),
                         ("Havoc", 13, 5, 14, 7),
                         ("Havoc", 13, 12, 14, 14),
                         ("PactProtoCarrier", 15, 6, 16, 8),
                         ("PactProtoCarrier", 15, 11, 16, 13),
                         ("PactOutpostArcade", 14, 7, 14, 7),
                         ("PactOutpostArcade", 14, 12, 14, 12),
-                        ("Nightmare_Flierdrone", 12, 7, 12, 7),
-                        ("Nightmare_Flierdrone", 13, 8, 13, 8),
-                        ("Nightmare_Flierdrone", 13, 10, 13, 10),
-                        ("Nightmare_Flierdrone", 12, 11, 12, 11),
-                        #("Arcadius", 11, 3, 12, 5),
-                        #("Arcadius", 11, 12, 12, 14),
+                        ("Nightmare_Flierdrone_Arcade", 12, 7, 12, 7),
+                        ("Nightmare_Flierdrone_Arcade", 13, 8, 13, 8),
+                        ("Nightmare_Flierdrone_Arcade", 13, 10, 13, 10),
+                        ("Nightmare_Flierdrone_Arcade", 12, 11, 12, 11),
+                        ("PactSupport", 11, 3, 12, 5),
+                        ("PactSupport", 11, 12, 12, 14),
                         ("RyuvianCruiser", 11, 4, 12, 6),
                         ("RyuvianCruiser", 11, 11, 12, 13),
                         ("RyuvianCruiser", 10, 4, 11, 6),
                         ("RyuvianCruiser", 10, 11, 11, 13),
-                        ("Nightmare_Flierdrone", 12, 5, 13, 5),
-                        ("Nightmare_Flierdrone", 12, 11, 13, 11),
+                        ("Nightmare_Flierdrone_Arcade", 12, 5, 13, 5),
+                        ("Nightmare_Flierdrone_Arcade", 12, 11, 13, 11),
                 }
             },
         ]
@@ -286,11 +296,21 @@ init 9 python:
     class Nightmare_Ascendant_Arcade(Nightmare_Ascendant):
         def __init__(self):
             super(Nightmare_Ascendant_Arcade, self).__init__()
-            self.default_weapon_list = [NightmareLaser(),NightmarePulse(),NightmareMissile(),NightmareMelee(),HavocRocket()]
+            self.default_weapon_list = [BossRocket(),BossLaser(),BossMelee()]
             self.max_missiles = 2
             self.max_rockets = 2
             self.missiles = self.max_missiles
             self.rockets = self.max_rockets
+            self.brain = BossAI(self)
+            self.name = "Boss"
+            self.blbl = im.MatrixColor('Battle UI/label_nightmareascendant.png',im.matrix.hue(265))  #temp image
+            self.lbl = self.blbl
+
+    class Nightmare_Flierdrone_Arcade(Nightmare_Flierdrone):
+        def __init__(self):
+            super(Nightmare_Flierdrone_Arcade, self).__init__()
+            self.blbl = im.MatrixColor('Battle UI/label_nightmareflier.png',im.matrix.hue(265))  #this is the battle avatar
+            self.lbl = self.blbl
             
             
     class PactOutpostArcade(PactOutpost):
@@ -454,8 +474,17 @@ init 9 python:
                 renpy.show_screen('battle_screen')
                 if BM.phase == 'Player':
                     if not target == parent and target.faction == 'Player':
-                        if target.buffed_voice is not None:
-                            renpy.music.play( renpy.random.choice(target.buffed_voice), channel = target.voice_channel )
+                        if target.pilot is not None: ##N
+                            if target != self.parent:
+                                target.voice('HitBuff')
+                        else:
+                            if target.buffed_voice is not None:
+                                a = renpy.random.randint(0,len(target.buffed_voice)-1)
+                                renpy.music.play('{}'.format(target.buffed_voice[a]),channel = target.voice_channel)
+                                del a
+
+                           #if target.buffed_voice is not None:
+                           #     renpy.music.play( renpy.random.choice(target.buffed_voice), channel = target.voice_channel )
                 message = "{0} reloading missiles for {1}".format(parent.name, target.name) # we can't make this only display when in enemy phase; it hides the buff anim
                 show_message(message)
                 target.getting_buff = False
@@ -568,51 +597,74 @@ init 9 python:
         cost = 6000
         limit = 1
         action = ("addCMDPoints", 1000)
+
+    class visitResearch(ArcadeStoreItem): ##N
+        id = "vResearch" ##N
+        name = "R&D" ##N
+        tooltip = "Let's you visit R&D for upgrading your units" ##N
+        cost = store.arcadeRDcost ##N
+        action = ("visitResearch",) ##N
+    avc = visitResearch()
+    class endarcade(ArcadeStoreItem): ##N
+        id = "endearcade" ##N
+        name = "Quit" ##N
+        tooltip = "Quit the during arcade." ##N
+        cost = 0 ##N
+        action = ("endarcade",) ##N
+    enarcade = endarcade()
+    class Researchvisit(ArcadeStoreItem): ##N
+        id = "viResearch" ##N
+        name = "R&D" ##N
+        tooltip = "Let's you visit R&D for upgrading your units" ##N
+        cost = store.arcadeRDcost ##N
+        action = ("visitResearch") ##N
                 
-    arcadeStoreItems = [CeraGunboatArcadeStore(), UnionFrigateArcadeStore(), UnionBattleshipArcadeStore(), 
-                AllianceCruiserArcadeStore(), AllianceBattleshipArcadeStore(), PactEliteArcadeStore(), 
-                RyuvianFalconArcadeStore(),FreighterArcadeStore(),RepairDroneArcadeStore(), TorpedoArcadeStore(), 
-                AwakeningArcadeStore(), CommandUpgradeArcadeStore()]
+        if not hasattr(store,'arcadeStoreItems'): arcadeStoreItems = []##N
                 
 label arcade_inits:
     python:
+        
         store.tempmoney = BM.money
         store.tempcmd = BM.cmd
-        # store.temprockets = store.sunrider.rockets
-        # store.temprepair_drones = store.sunrider.repair_drones
-        
+        store.tempintel = BM.intel
+        if not hasattr(store,'arcadefrommenu'):
+            arcadefrommenu = False     
         # TODO make it not crash
-        #if 'sunrider' in globals():
+        if not arcadefrommenu:
         #    player_ships_original = player_ships
         #    original_sunrider = sunrider
-        
-        BM.money = 0
-        BM.cmd = 0
-        BM.intel = 30000
-        BM.orders['SHORT RANGE WARP'] = [750,'short_range_warp']
-        BM.orders["RESURRECTION"] = [2500,'resurrection']
+            store.temprockets = store.sunrider.rockets
+            store.temprepair_drones = store.sunrider.repair_drones
+            store.temprocketspaladin = store.paladin.rockets
+        if arcadefrommenu:
+            arcadefrommenu = True
+            BM.money = 0
+            BM.cmd = 0
+            BM.intel = 30000
+            BM.orders['SHORT RANGE WARP'] = [750,'short_range_warp']
+            BM.orders["RESURRECTION"] = [2500,'resurrection']
 
-        sunrider_weapons = [SunriderLaser(),SunriderKinetic(),SunriderMissile(),SunriderRocket(),SunriderAssault(),SunriderPulse()]
-        sunrider = create_ship(Sunrider(),(1,1),sunrider_weapons)
-        sunrider.repair_drones = 1
+            sunrider_weapons = [SunriderLaser(),SunriderKinetic(),SunriderMissile(),SunriderRocket(),SunriderAssault(),SunriderPulse()]
+            sunrider = create_ship(Sunrider(),(1,1),sunrider_weapons)
+            sunrider.repair_drones = 1
 
-        blackjack_weapons = [BlackjackMelee(),BlackjackLaser(),BlackjackAssault(),BlackjackMissile(),BlackjackPulse()]
-        blackjack = create_ship(BlackJack(),(1,2),blackjack_weapons)
+            blackjack_weapons = [BlackjackMelee(),BlackjackLaser(),BlackjackAssault(),BlackjackMissile(),BlackjackPulse()]
+            blackjack = create_ship(BlackJack(),(1,2),blackjack_weapons)
 
-        liberty_weapons = [LibertyLaser(),Repair(),AccUp(),Disable(),FlakOff(),ShutOff()]
-        liberty = create_ship(Liberty(),(5,7),liberty_weapons)
+            liberty_weapons = [LibertyLaser(),Repair(),AccUp(),Disable(),FlakOff(),ShutOff()]
+            liberty = create_ship(Liberty(),(5,7),liberty_weapons)
 
-        phoenix_weapons = [PhoenixAssault(),PhoenixMelee(),Stealth()]
-        phoenix = create_ship(Phoenix(),(9,5),phoenix_weapons)
+            phoenix_weapons = [PhoenixAssault(),PhoenixMelee(),Stealth()]
+            phoenix = create_ship(Phoenix(),(9,5),phoenix_weapons)
 
-        bianca_weapons = [BiancaAssault(),GravityGun(),AccDown(),DamageUp(),Restore()]
-        bianca = create_ship(Bianca(),(14,7),bianca_weapons)
+            bianca_weapons = [BiancaAssault(),GravityGun(),AccDown(),DamageUp(),Restore()]
+            bianca = create_ship(Bianca(),(14,7),bianca_weapons)
 
-        seraphim_weapons = [SeraphimKinetic(),Awaken()]
-        seraphim = create_ship(Seraphim(),(6,8),seraphim_weapons)
+            seraphim_weapons = [SeraphimKinetic(),Awaken()]
+            seraphim = create_ship(Seraphim(),(6,8),seraphim_weapons)
 
-        paladin_weapons = [PaladinMissile(),PaladinAssault(),PaladinKinetic(), Taunt()]
-        paladin = create_ship(Paladin(),(9,8),paladin_weapons)
+            paladin_weapons = [PaladinMissile(),PaladinAssault(),PaladinKinetic(), Taunt()]
+            paladin = create_ship(Paladin(),(9,8),paladin_weapons)
         
         #store.sunrider = sunrider
         #store.blackjack = blackjack
@@ -622,195 +674,121 @@ label arcade_inits:
         #store.seraphim = seraphim
         #store.paladin = paladin
         
-        process_upgrade(sunrider,"max_hp",10)
-        process_upgrade(sunrider,"max_en",7)
-        process_upgrade(sunrider,"evasion",1)
-        process_upgrade(sunrider,"kinetic_dmg",6)
-        process_upgrade(sunrider,"kinetic_acc",3)
-        process_upgrade(sunrider,"kinetic_cost",4)
-        process_upgrade(sunrider,"energy_dmg",6)
-        process_upgrade(sunrider,"energy_acc",3)
-        process_upgrade(sunrider,"energy_cost",4)
-        process_upgrade(sunrider,"missile_dmg",6)
-        process_upgrade(sunrider,"missile_eccm",2)
-        process_upgrade(sunrider,"missile_cost",2)
-        process_upgrade(sunrider,"max_missiles",3)
-        process_upgrade(sunrider,"flak",3)
-        process_upgrade(sunrider,"base_armor",2)
+            process_upgrade(sunrider,"max_hp",10)
+            process_upgrade(sunrider,"max_en",7)
+            process_upgrade(sunrider,"evasion",1)
+            process_upgrade(sunrider,"kinetic_dmg",6)
+            process_upgrade(sunrider,"kinetic_acc",3)
+            process_upgrade(sunrider,"kinetic_cost",4)
+            process_upgrade(sunrider,"energy_dmg",6)
+            process_upgrade(sunrider,"energy_acc",3)
+            process_upgrade(sunrider,"energy_cost",4)
+            process_upgrade(sunrider,"missile_dmg",6)
+            process_upgrade(sunrider,"missile_eccm",2)
+            process_upgrade(sunrider,"missile_cost",2)
+            process_upgrade(sunrider,"max_missiles",3)
+            process_upgrade(sunrider,"flak",3)
+            process_upgrade(sunrider,"base_armor",2)
 
-        process_upgrade(blackjack,"max_hp",3)
-        process_upgrade(blackjack,"max_en",3)
-        process_upgrade(blackjack,"evasion",1)
-        process_upgrade(blackjack,"kinetic_dmg",3)
-        process_upgrade(blackjack,"kinetic_acc",3)
-        process_upgrade(blackjack,"kinetic_cost",2)
-        process_upgrade(blackjack,"energy_dmg",3)
-        process_upgrade(blackjack,"energy_acc",3)
-        process_upgrade(blackjack,"energy_cost",2)
-        process_upgrade(blackjack,"missile_dmg",3)
-        process_upgrade(blackjack,"missile_eccm",1)
-        process_upgrade(blackjack,"missile_cost",1)
-        process_upgrade(blackjack,"max_missiles",2)
-        process_upgrade(blackjack,"melee_dmg",3)
-        process_upgrade(blackjack,"melee_acc",1)
-        process_upgrade(blackjack,"melee_cost",1)
-        process_upgrade(blackjack,"flak",2)
-        process_upgrade(blackjack,"base_armor",2)
+            process_upgrade(blackjack,"max_hp",3)
+            process_upgrade(blackjack,"max_en",3)
+            process_upgrade(blackjack,"evasion",1)
+            process_upgrade(blackjack,"kinetic_dmg",3)
+            process_upgrade(blackjack,"kinetic_acc",3)
+            process_upgrade(blackjack,"kinetic_cost",2)
+            process_upgrade(blackjack,"energy_dmg",3)
+            process_upgrade(blackjack,"energy_acc",3)
+            process_upgrade(blackjack,"energy_cost",2)
+            process_upgrade(blackjack,"missile_dmg",3)
+            process_upgrade(blackjack,"missile_eccm",1)
+            process_upgrade(blackjack,"missile_cost",1)
+            process_upgrade(blackjack,"max_missiles",2)
+            process_upgrade(blackjack,"melee_dmg",3)
+            process_upgrade(blackjack,"melee_acc",1)
+            process_upgrade(blackjack,"melee_cost",1)
+            process_upgrade(blackjack,"flak",2)
+            process_upgrade(blackjack,"base_armor",2)
 
-        process_upgrade(liberty,"max_hp",3)
-        process_upgrade(liberty,"max_en",6)
-        process_upgrade(liberty,"evasion",2)
-        process_upgrade(liberty,"energy_dmg",1)
-        process_upgrade(liberty,"energy_acc",1)
-        process_upgrade(liberty,"energy_cost",1)
-        process_upgrade(liberty,"shield_generation",2)
-        process_upgrade(liberty,"shield_range",2)
-        process_upgrade(liberty,"base_armor",1)
+            process_upgrade(liberty,"max_hp",3)
+            process_upgrade(liberty,"max_en",6)
+            process_upgrade(liberty,"evasion",2)
+            process_upgrade(liberty,"energy_dmg",1)
+            process_upgrade(liberty,"energy_acc",1)
+            process_upgrade(liberty,"energy_cost",1)
+            process_upgrade(liberty,"shield_generation",2)
+            process_upgrade(liberty,"shield_range",2)
+            process_upgrade(liberty,"base_armor",1)
 
-        process_upgrade(phoenix,"max_hp",3)
-        process_upgrade(phoenix,"max_en",3)
-        process_upgrade(phoenix,"evasion",3)
-        process_upgrade(phoenix,"kinetic_dmg",3)
-        process_upgrade(phoenix,"kinetic_acc",3)
-        process_upgrade(phoenix,"kinetic_cost",2)
-        process_upgrade(phoenix,"melee_dmg",3)
-        process_upgrade(phoenix,"melee_acc",2)
-        process_upgrade(phoenix,"melee_cost",2)
-        process_upgrade(phoenix,"flak",2)
-        process_upgrade(phoenix,"base_armor",1)
+            process_upgrade(phoenix,"max_hp",3)
+            process_upgrade(phoenix,"max_en",3)
+            process_upgrade(phoenix,"evasion",3)
+            process_upgrade(phoenix,"kinetic_dmg",3)
+            process_upgrade(phoenix,"kinetic_acc",3)
+            process_upgrade(phoenix,"kinetic_cost",2)
+            process_upgrade(phoenix,"melee_dmg",3)
+            process_upgrade(phoenix,"melee_acc",2)
+            process_upgrade(phoenix,"melee_cost",2)
+            process_upgrade(phoenix,"flak",2)
+            process_upgrade(phoenix,"base_armor",1)
 
-        process_upgrade(bianca,"max_hp",3)
-        process_upgrade(bianca,"max_en",5)
-        process_upgrade(bianca,"evasion",1)
-        process_upgrade(bianca,"kinetic_dmg",2)
-        process_upgrade(bianca,"kinetic_acc",2)
-        process_upgrade(bianca,"kinetic_cost",1)
-        process_upgrade(bianca,"shield_generation",2)
-        process_upgrade(bianca,"shield_range",1)
-        process_upgrade(bianca,"base_armor",1)
+            process_upgrade(bianca,"max_hp",3)
+            process_upgrade(bianca,"max_en",5)
+            process_upgrade(bianca,"evasion",1)
+            process_upgrade(bianca,"kinetic_dmg",2)
+            process_upgrade(bianca,"kinetic_acc",2)
+            process_upgrade(bianca,"kinetic_cost",1)
+            process_upgrade(bianca,"shield_generation",2)
+            process_upgrade(bianca,"shield_range",1)
+            process_upgrade(bianca,"base_armor",1)
 
-        process_upgrade(seraphim,"max_hp",3)
-        process_upgrade(seraphim,"max_en",3)
-        process_upgrade(seraphim,"evasion",1)
-        process_upgrade(seraphim,"kinetic_dmg",7)
-        process_upgrade(seraphim,"kinetic_acc",2)
-        process_upgrade(seraphim,"kinetic_cost",3)
-        process_upgrade(seraphim,"base_armor",1)
+            process_upgrade(seraphim,"max_hp",3)
+            process_upgrade(seraphim,"max_en",3)
+            process_upgrade(seraphim,"evasion",1)
+            process_upgrade(seraphim,"kinetic_dmg",7)
+            process_upgrade(seraphim,"kinetic_acc",2)
+            process_upgrade(seraphim,"kinetic_cost",3)
+            process_upgrade(seraphim,"base_armor",1)
         
-        process_upgrade(paladin,"max_hp",3)
-        process_upgrade(paladin,"max_en",3)
-        process_upgrade(paladin,"evasion",1)
-        process_upgrade(paladin,"kinetic_dmg",4)
-        process_upgrade(paladin,"kinetic_acc",2)
-        process_upgrade(paladin,"kinetic_cost",3)
-        process_upgrade(paladin,"missile_dmg",2)
-        process_upgrade(paladin,"missile_eccm",2)
-        process_upgrade(paladin,"missile_cost",2)
-        process_upgrade(paladin,"max_missiles",1)
-        process_upgrade(paladin,"flak",1)
-        process_upgrade(paladin,"base_armor",2)
+            process_upgrade(paladin,"max_hp",3)
+            process_upgrade(paladin,"max_en",3)
+            process_upgrade(paladin,"evasion",1)
+            process_upgrade(paladin,"kinetic_dmg",4)
+            process_upgrade(paladin,"kinetic_acc",2)
+            process_upgrade(paladin,"kinetic_cost",3)
+            process_upgrade(paladin,"missile_dmg",2)
+            process_upgrade(paladin,"missile_eccm",2)
+            process_upgrade(paladin,"missile_cost",2)
+            process_upgrade(paladin,"max_missiles",1)
+            process_upgrade(paladin,"flak",1)
+            process_upgrade(paladin,"base_armor",2)
         
         # grav gun booster
-        store.bianca.weapons[1].energy_use = 40
-        store.bianca.weapons[1].keep_after_reset['energy_use'] = 40
+            store.bianca.weapons[1].energy_use = 40
+            store.bianca.weapons[1].keep_after_reset['energy_use'] = 40
         
         # Sunrider shield
-        store.sunrider.shield_generation = 15
-        store.sunrider.shields = store.sunrider.shield_generation
-        store.sunrider.shield_range = 0
+            store.sunrider.shield_generation = 15
+            store.sunrider.shields = store.sunrider.shield_generation
+            store.sunrider.shield_range = 0
         
         # repair booster
-        if not hasattr(store,'chigara_repair'):store.chigara_repair = liberty.weapons[1]
-        store.chigara_repair.damage = 500
-        store.chigara_repair.keep_after_reset['damage'] = 500
-        store.chigara_repair.energy_use = 70
-        store.chigara_repair.keep_after_reset['energy_use'] = 70
+            if not hasattr(store,'chigara_repair'):store.chigara_repair = liberty.weapons[1]
+            store.chigara_repair.damage = 500
+            store.chigara_repair.keep_after_reset['damage'] = 500
+            store.chigara_repair.energy_use = 70
+            store.chigara_repair.keep_after_reset['energy_use'] = 70
             
         # quantum torps
-        if not hasattr(store,'sunrider_rocket'):store.sunrider_rocket = sunrider.weapons[3]
-        store.sunrider_rocket.damage = 1200
-        store.sunrider_rocket.keep_after_reset['damage'] = 1200
+            if not hasattr(store,'sunrider_rocket'):store.sunrider_rocket = sunrider.weapons[3]
+            store.sunrider_rocket.damage = 1200
+            store.sunrider_rocket.keep_after_reset['damage'] = 1200
         
-        store.legion_destroyed = False
+            store.legion_destroyed = False
 
     return
 
-# main menu screen override
-init 9:
-    screen main_menu:
-
-        zorder 1000
-
-        add "UI/black.jpg"
-
-        add "UI/mainmenu_back.jpg" at tr_fadein(0.2)
-
-
-        text "[config.name] V[config.version]" font "Fonts/SourceCodePro-Regular.ttf" xpos 50 ypos 25 size 15 color "F7F7F7"
-
-        if CENSOR == False:
-
-            text 'DENPA EDITION' font "Fonts/SourceCodePro-Regular.ttf" xpos 50 ypos 50 size 15 color "F7F7F7"
-
-        if CENSOR == True:
-
-            text 'STEAM EDITION' font "Fonts/SourceCodePro-Regular.ttf" xpos 50 ypos 50 size 15 color "F7F7F7"
-            
-        imagebutton at tr_menubutton(0.5,1920):
-            xpos 2820 ypos 422 xanchor 810
-            idle "UI/mainmenu_button.png"
-            hover tr_hoverglow("UI/mainmenu_button.png")
-            hover_sound "sound/hover1.ogg"
-            activate_sound "sound/button1.ogg"
-            action Hide("main_menu"),Show("history")
-        add "UI/mainmenu_start.png" at tr_menubutton(0.5,1920):
-            xpos 2300 ypos 422 xanchor 531
-
-        imagebutton at tr_menubutton(0.6,1920):
-            xpos 2820 ypos 496 xanchor 810
-            idle "UI/mainmenu_button.png"
-            hover tr_hoverglow("UI/mainmenu_button.png")
-            hover_sound "sound/hover1.ogg"
-            activate_sound "sound/button1.ogg"
-            action Show("load")
-        add "UI/mainmenu_load.png" at tr_menubutton(0.6,1920):
-            xpos 2300 ypos 496 xanchor 531
-
-        imagebutton at tr_menubutton(0.7,1920):
-            xpos 2820 ypos 570 xanchor 810
-            idle "UI/mainmenu_button.png"
-            hover tr_hoverglow("UI/mainmenu_button.png")
-            hover_sound "sound/hover1.ogg"
-            activate_sound "sound/button1.ogg"
-            action Show("preferences")
-        add "UI/mainmenu_options.png" at tr_menubutton(0.7,1920):
-            xpos 2300 ypos 570 xanchor 531
-
-        imagebutton at tr_menubutton(0.8,1920):
-            xpos 2820 ypos 644 xanchor 810
-            idle "UI/mainmenu_button.png"
-            hover tr_hoverglow("UI/mainmenu_button.png")
-            hover_sound "sound/hover1.ogg"
-            activate_sound "sound/button1.ogg"
-            action Start("arcade_from_main_menu")
-        add "UI/mainmenu_bonus.png" at tr_menubutton(0.8,1920):
-            xpos 2300 ypos 644 xanchor 531
-
-        imagebutton at tr_menubutton(0.9,1920):
-            xpos 2820 ypos 718 xanchor 810
-            idle "UI/mainmenu_button.png"
-            hover tr_hoverglow("UI/mainmenu_button.png")
-            hover_sound "sound/hover1.ogg"
-            activate_sound "sound/button1.ogg"
-            action Quit()
-        add "UI/mainmenu_quit.png" at tr_menubutton(0.9,1920):
-            xpos 2300 ypos 718 xanchor 531   
-
-        add "UI/mainmenu_ava.png" xpos -200 at tr_menubutton(0.5,0)
-        add "UI/mainmenu_sola.png" xpos -200 at tr_menubutton(0.6,0)
-        add "UI/mainmenu_claude.png" xpos -200 at tr_menubutton(0.8,0)
-        add "UI/mainmenu_cosette.png" xpos -200 at tr_menubutton(0.7,0)
-        add "UI/mainmenu_chigara.png" xpos -200 at tr_menubutton(0.9,0)
-        add "UI/mainmenu_kryscari.png" xpos -200 at tr_menubutton(1,0)
-        add "UI/mainmenu_asaga.png" xpos -200 at tr_menubutton(1.1,0)
-        add "UI/mainmenu_logo.png" xpos -200 ypos 0 at tr_menubutton(0.3,0)
+init 9 python:
+    def start_arcade():
+        renpy.hide_screen('main_menu')
+        arcadefrommenu = True
+        renpy.jump("arcade_from_main_menu")
